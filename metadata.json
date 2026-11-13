@@ -1,0 +1,6 @@
+{
+  "name": "Mehrad Laravel Devkit",
+  "description": "Phase 1 Laravel + React + Inertia + TypeScript + Tailwind + shadcn/ui Starter Kit based on the Mehrad architecture specification.",
+  "requestFramePermissions": [],
+  "majorCapabilities": []
+}

@@ -1,0 +1,40 @@
+# Dependencies & Build Output
+/vendor/
+/node_modules/
+node_modules/
+build/
+dist/
+coverage/
+/public/build/
+/public/hot
+
+# Environment & Secrets
+.env
+.env.*
+!.env.example
+.phpunit.result.cache
+
+# Laravel Storage & Caches
+/storage/*.key
+/storage/framework/cache/*
+!/storage/framework/cache/.gitignore
+/storage/framework/sessions/*
+!/storage/framework/sessions/.gitignore
+/storage/framework/testing/*
+!/storage/framework/testing/.gitignore
+/storage/framework/views/*
+!/storage/framework/views/.gitignore
+/storage/logs/*
+!/storage/logs/.gitignore
+/bootstrap/cache/*
+!/bootstrap/cache/.gitignore
+
+# IDE, OS & Tooling
+.DS_Store
+*.log
+.idea/
+.vscode/
+.fleet/
+.nova/
+.zed/
+.playwright-cli/
