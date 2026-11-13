@@ -20,7 +20,7 @@ export const PHASE_1_STACK: StackDependency[] = [
   {
     name: 'Inertia Laravel',
     packageName: 'inertiajs/inertia-laravel',
-    version: '^2.0',
+    version: '^3.7',
     layer: 'backend',
     purpose: 'Server-driven SPA adapter connecting Laravel controllers to React pages.',
     phase: 'Phase 1',
