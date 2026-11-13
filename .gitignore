@@ -5,6 +5,7 @@ node_modules/
 build/
 dist/
 coverage/
+bun.lock
 /public/build/
 /public/hot
 
