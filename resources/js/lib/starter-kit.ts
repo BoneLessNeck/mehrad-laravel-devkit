@@ -1,5 +1,4 @@
 import type {
-  AppRoute,
   SetupStep,
   StackDependency,
   StackLayer,
@@ -34,17 +33,25 @@ export const PHASE_1_STACK: StackDependency[] = [
     phase: 'Phase 1',
   },
   {
-    name: 'React & React DOM',
-    packageName: 'react',
-    version: '^19.0.1',
+    name: 'React & Inertia React',
+    packageName: '@inertiajs/react',
+    version: '^3.11.0',
     layer: 'frontend',
-    purpose: 'Component-driven UI runtime for pages, layouts, and interactive forms.',
+    purpose: 'React 19 + Inertia adapter for server-driven links, forms, and page props.',
+    phase: 'Phase 1',
+  },
+  {
+    name: 'Laravel Vite Plugin',
+    packageName: 'laravel-vite-plugin',
+    version: '^3.2.1',
+    layer: 'frontend',
+    purpose: 'Integrates Vite 8 asset bundling and manifest resolution with Laravel.',
     phase: 'Phase 1',
   },
   {
     name: 'TypeScript',
     packageName: 'typescript',
-    version: '^7.0.2',
+    version: '^6.0.3',
     layer: 'frontend',
     purpose: 'Static type safety across Inertia page props, hooks, and UI primitives.',
     phase: 'Phase 1',
@@ -74,6 +81,14 @@ export const PHASE_1_STACK: StackDependency[] = [
     phase: 'Phase 1',
   },
   {
+    name: 'ESLint & Prettier',
+    packageName: 'eslint',
+    version: '^10.15.0',
+    layer: 'quality',
+    purpose: 'TypeScript, React Hooks, and Tailwind class formatting checks.',
+    phase: 'Phase 1',
+  },
+  {
     name: 'Laravel Sail',
     packageName: 'laravel/sail',
     version: '^1.39',
@@ -84,9 +99,9 @@ export const PHASE_1_STACK: StackDependency[] = [
   {
     name: 'GitHub Actions CI',
     packageName: '.github/workflows/ci.yml',
-    version: 'v4',
+    version: 'v1',
     layer: 'infrastructure',
-    purpose: 'Automated Pint, Pest, TypeScript lint, unit test, and Vite build checks.',
+    purpose: 'Automated Pint, Pest, ESLint, TypeScript, Prettier, and Vite checks.',
     phase: 'Phase 1',
   },
 ];
@@ -103,9 +118,14 @@ export const PHASE_1_FILES: StarterFileNode[] = [
     summary: 'Validates registration input, hashes password, and logs in new users.',
   },
   {
+    path: 'app/Http/Controllers/Auth/NewPasswordController.php',
+    layer: 'backend',
+    summary: 'Renders password reset form and completes token-verified password resets.',
+  },
+  {
     path: 'app/Http/Controllers/Settings/ProfileController.php',
     layer: 'backend',
-    summary: 'Updates user profile details and handles account deletion.',
+    summary: 'Updates user profile details and handles password-confirmed account deletion.',
   },
   {
     path: 'app/Http/Middleware/HandleInertiaRequests.php',
@@ -115,7 +135,7 @@ export const PHASE_1_FILES: StarterFileNode[] = [
   {
     path: 'routes/web.php',
     layer: 'backend',
-    summary: 'Defines home, verified dashboard, auth, and settings route groups.',
+    summary: 'Defines home, authenticated dashboard, auth, and settings route groups.',
   },
   {
     path: 'database/migrations/0001_01_01_000000_create_users_table.php',
@@ -123,9 +143,14 @@ export const PHASE_1_FILES: StarterFileNode[] = [
     summary: 'Creates users, password_reset_tokens, and sessions tables.',
   },
   {
+    path: 'resources/js/app.tsx',
+    layer: 'frontend',
+    summary: 'Initializes createInertiaApp with resolvePageComponent and theme setup.',
+  },
+  {
     path: 'resources/js/layouts/app-layout.tsx',
     layer: 'frontend',
-    summary: 'Authenticated workspace shell with collapsible sidebar and breadcrumbs.',
+    summary: 'Authenticated workspace shell using Inertia Links and breadcrumbs.',
   },
   {
     path: 'resources/js/pages/welcome.tsx',
@@ -145,7 +170,7 @@ export const PHASE_1_FILES: StarterFileNode[] = [
   {
     path: 'tests/Feature/Auth/AuthenticationTest.php',
     layer: 'quality',
-    summary: 'Pest tests covering login screen rendering, authentication, and logout.',
+    summary: 'Pest tests covering login rendering, authentication, validation, and logout.',
   },
   {
     path: 'pint.json',
@@ -160,7 +185,7 @@ export const PHASE_1_FILES: StarterFileNode[] = [
   {
     path: '.github/workflows/ci.yml',
     layer: 'infrastructure',
-    summary: 'GitHub Actions pipeline verifying backend and frontend builds.',
+    summary: 'GitHub Actions pipeline verifying backend and frontend checks.',
   },
 ];
 
@@ -257,10 +282,7 @@ export function isValidEmail(email: string): boolean {
   return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email.trim());
 }
 
-export function validateLoginForm(input: {
-  email: string;
-  password: string;
-}): ValidationErrors {
+export function validateLoginForm(input: { email: string; password: string }): ValidationErrors {
   const errors: ValidationErrors = {};
   if (!input.email.trim()) {
     errors.email = 'Email address is required.';
@@ -305,10 +327,7 @@ export function validateRegisterForm(input: {
   return errors;
 }
 
-export function validateProfileForm(input: {
-  name: string;
-  email: string;
-}): ValidationErrors {
+export function validateProfileForm(input: { name: string; email: string }): ValidationErrors {
   const errors: ValidationErrors = {};
   if (!input.name.trim()) {
     errors.name = 'Name is required.';
@@ -341,36 +360,9 @@ export function validatePasswordForm(input: {
   return errors;
 }
 
-export function resolveEffectiveTheme(
-  mode: ThemeMode,
-  prefersDark: boolean
-): 'light' | 'dark' {
+export function resolveEffectiveTheme(mode: ThemeMode, prefersDark: boolean): 'light' | 'dark' {
   if (mode === 'system') {
     return prefersDark ? 'dark' : 'light';
   }
   return mode;
-}
-
-export function getRouteBreadcrumbs(route: AppRoute): { title: string; route: AppRoute }[] {
-  switch (route) {
-    case 'dashboard':
-      return [{ title: 'Dashboard', route: 'dashboard' }];
-    case 'settings.profile':
-      return [
-        { title: 'Settings', route: 'settings.profile' },
-        { title: 'Profile', route: 'settings.profile' },
-      ];
-    case 'settings.password':
-      return [
-        { title: 'Settings', route: 'settings.profile' },
-        { title: 'Password', route: 'settings.password' },
-      ];
-    case 'settings.appearance':
-      return [
-        { title: 'Settings', route: 'settings.profile' },
-        { title: 'Appearance', route: 'settings.appearance' },
-      ];
-    default:
-      return [{ title: 'Mehrad Devkit', route: 'welcome' }];
-  }
 }

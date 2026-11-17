@@ -1,6 +1,6 @@
+import { resolveEffectiveTheme } from '@/lib/starter-kit';
+import type { ThemeMode } from '@/types';
 import { useCallback, useEffect, useState } from 'react';
-import { resolveEffectiveTheme } from '../lib/starter-kit';
-import type { ThemeMode } from '../types';
 
 const STORAGE_KEY = 'mehrad-appearance';
 
@@ -14,6 +14,14 @@ function applyThemeToDocument(mode: ThemeMode) {
   } else {
     root.classList.remove('dark');
   }
+}
+
+export function initializeTheme(): void {
+  if (typeof window === 'undefined') return;
+  const saved = window.localStorage.getItem(STORAGE_KEY) as ThemeMode | null;
+  const mode: ThemeMode =
+    saved === 'light' || saved === 'dark' || saved === 'system' ? saved : 'light';
+  applyThemeToDocument(mode);
 }
 
 export function useAppearance() {

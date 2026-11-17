@@ -22,8 +22,10 @@ services:
         networks:
             - sail
         depends_on:
-            - mysql
-            - mailpit
+            mysql:
+                condition: service_healthy
+            mailpit:
+                condition: service_started
     mysql:
         image: 'mysql/mysql-server:8.0'
         ports:

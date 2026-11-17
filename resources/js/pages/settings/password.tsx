@@ -1,56 +1,50 @@
-import { useState, type FormEvent } from 'react';
-import { Button } from '../../components/ui/button';
-import { Input } from '../../components/ui/input';
-import { Label } from '../../components/ui/label';
-import { AppLayout } from '../../layouts/app-layout';
-import { SettingsLayout } from '../../layouts/settings-layout';
-import { getRouteBreadcrumbs, validatePasswordForm } from '../../lib/starter-kit';
-import type { AppRoute, User, ValidationErrors } from '../../types';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import { AppLayout } from '@/layouts/app-layout';
+import { SettingsLayout } from '@/layouts/settings-layout';
+import type { BreadcrumbItem } from '@/types';
+import { Head, useForm } from '@inertiajs/react';
+import { useRef, type FormEventHandler } from 'react';
+import { route } from 'ziggy-js';
 
-interface PasswordSettingsPageProps {
-  user: User;
-  onNavigate: (route: AppRoute) => void;
-  onLogout: () => void;
-}
+export default function Password() {
+  const currentPasswordInput = useRef<HTMLInputElement>(null);
+  const passwordInput = useRef<HTMLInputElement>(null);
 
-export function PasswordSettingsPage({
-  user,
-  onNavigate,
-  onLogout,
-}: PasswordSettingsPageProps) {
-  const [currentPassword, setCurrentPassword] = useState('');
-  const [password, setPassword] = useState('');
-  const [passwordConfirmation, setPasswordConfirmation] = useState('');
-  const [errors, setErrors] = useState<ValidationErrors>({});
-  const [savedNotice, setSavedNotice] = useState(false);
+  const { data, setData, put, processing, errors, reset, recentlySuccessful } = useForm({
+    current_password: '',
+    password: '',
+    password_confirmation: '',
+  });
 
-  const handleSubmit = (e: FormEvent<HTMLFormElement>) => {
+  const breadcrumbs: BreadcrumbItem[] = [
+    { title: 'Settings', href: route('profile.edit') },
+    { title: 'Password', href: route('password.edit') },
+  ];
+
+  const handleSubmit: FormEventHandler = (e) => {
     e.preventDefault();
-    const validation = validatePasswordForm({
-      currentPassword,
-      password,
-      passwordConfirmation,
+    put(route('password.update'), {
+      preserveScroll: true,
+      onSuccess: () => reset(),
+      onError: (formErrors) => {
+        if (formErrors.password) {
+          reset('password', 'password_confirmation');
+          passwordInput.current?.focus();
+        }
+        if (formErrors.current_password) {
+          reset('current_password');
+          currentPasswordInput.current?.focus();
+        }
+      },
     });
-    setErrors(validation);
-    if (Object.keys(validation).length > 0) {
-      setSavedNotice(false);
-      return;
-    }
-    setCurrentPassword('');
-    setPassword('');
-    setPasswordConfirmation('');
-    setSavedNotice(true);
   };
 
   return (
-    <AppLayout
-      user={user}
-      activeRoute="settings.password"
-      breadcrumbs={getRouteBreadcrumbs('settings.password')}
-      onNavigate={onNavigate}
-      onLogout={onLogout}
-    >
-      <SettingsLayout activeRoute="settings.password" onNavigate={onNavigate}>
+    <AppLayout breadcrumbs={breadcrumbs}>
+      <Head title="Password settings" />
+      <SettingsLayout>
         <div className="space-y-6">
           <div>
             <h2 className="text-lg font-semibold text-zinc-900 dark:text-zinc-100">
@@ -61,23 +55,22 @@ export function PasswordSettingsPage({
             </p>
           </div>
 
-          <form onSubmit={handleSubmit} noValidate className="space-y-4">
+          <form onSubmit={handleSubmit} className="space-y-4">
             <div className="space-y-1.5">
               <Label htmlFor="current-password">Current password</Label>
               <Input
                 id="current-password"
+                ref={currentPasswordInput}
                 type="password"
+                required
                 autoComplete="current-password"
-                value={currentPassword}
-                onChange={(e) => {
-                  setCurrentPassword(e.target.value);
-                  setSavedNotice(false);
-                }}
-                aria-invalid={Boolean(errors.currentPassword)}
+                value={data.current_password}
+                onChange={(e) => setData('current_password', e.target.value)}
+                aria-invalid={Boolean(errors.current_password)}
               />
-              {errors.currentPassword && (
+              {errors.current_password && (
                 <p className="text-xs text-red-600 dark:text-red-400" role="alert">
-                  {errors.currentPassword}
+                  {errors.current_password}
                 </p>
               )}
             </div>
@@ -86,13 +79,12 @@ export function PasswordSettingsPage({
               <Label htmlFor="new-password">New password</Label>
               <Input
                 id="new-password"
+                ref={passwordInput}
                 type="password"
+                required
                 autoComplete="new-password"
-                value={password}
-                onChange={(e) => {
-                  setPassword(e.target.value);
-                  setSavedNotice(false);
-                }}
+                value={data.password}
+                onChange={(e) => setData('password', e.target.value)}
                 aria-invalid={Boolean(errors.password)}
               />
               {errors.password && (
@@ -107,28 +99,25 @@ export function PasswordSettingsPage({
               <Input
                 id="confirm-new-password"
                 type="password"
+                required
                 autoComplete="new-password"
-                value={passwordConfirmation}
-                onChange={(e) => {
-                  setPasswordConfirmation(e.target.value);
-                  setSavedNotice(false);
-                }}
-                aria-invalid={Boolean(errors.passwordConfirmation)}
+                value={data.password_confirmation}
+                onChange={(e) => setData('password_confirmation', e.target.value)}
+                aria-invalid={Boolean(errors.password_confirmation)}
               />
-              {errors.passwordConfirmation && (
+              {errors.password_confirmation && (
                 <p className="text-xs text-red-600 dark:text-red-400" role="alert">
-                  {errors.passwordConfirmation}
+                  {errors.password_confirmation}
                 </p>
               )}
             </div>
 
             <div className="flex items-center gap-4">
-              <Button type="submit">Save password</Button>
-              {savedNotice && (
-                <span
-                  role="status"
-                  className="text-sm text-emerald-700 dark:text-emerald-400"
-                >
+              <Button type="submit" disabled={processing}>
+                {processing ? 'Saving...' : 'Save password'}
+              </Button>
+              {recentlySuccessful && (
+                <span role="status" className="text-sm text-emerald-700 dark:text-emerald-400">
                   Password updated.
                 </span>
               )}

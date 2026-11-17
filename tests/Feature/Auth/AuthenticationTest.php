@@ -31,6 +31,19 @@ test('users can not authenticate with invalid password', function () {
     $this->assertGuest();
 });
 
+test('login requires valid email and password', function () {
+    $response = $this->from('/login')->post('/login', [
+        'email' => '',
+        'password' => '',
+    ]);
+
+    $response
+        ->assertSessionHasErrors(['email', 'password'])
+        ->assertRedirect('/login');
+
+    $this->assertGuest();
+});
+
 test('users can logout', function () {
     $user = User::factory()->create();
 

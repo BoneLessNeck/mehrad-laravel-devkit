@@ -1,81 +1,74 @@
-import { useState, type FormEvent } from 'react';
-import { Button } from '../../components/ui/button';
-import { Input } from '../../components/ui/input';
-import { Label } from '../../components/ui/label';
-import { AuthLayout } from '../../layouts/auth-layout';
-import { isValidEmail } from '../../lib/starter-kit';
-import type { AppRoute } from '../../types';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import { AuthLayout } from '@/layouts/auth-layout';
+import { Head, Link, useForm } from '@inertiajs/react';
+import type { FormEventHandler } from 'react';
+import { route } from 'ziggy-js';
 
-interface ForgotPasswordPageProps {
-  onNavigate: (route: AppRoute) => void;
+interface ForgotPasswordProps {
+  status?: string;
 }
 
-export function ForgotPasswordPage({ onNavigate }: ForgotPasswordPageProps) {
-  const [email, setEmail] = useState('');
-  const [error, setError] = useState<string | null>(null);
-  const [submitted, setSubmitted] = useState(false);
+export default function ForgotPassword({ status }: ForgotPasswordProps) {
+  const { data, setData, post, processing, errors } = useForm({
+    email: '',
+  });
 
-  const handleSubmit = (e: FormEvent<HTMLFormElement>) => {
+  const handleSubmit: FormEventHandler = (e) => {
     e.preventDefault();
-    if (!email.trim()) {
-      setError('Email address is required.');
-      return;
-    }
-    if (!isValidEmail(email)) {
-      setError('Enter a valid email address.');
-      return;
-    }
-    setError(null);
-    setSubmitted(true);
+    post(route('password.email'));
   };
 
   return (
     <AuthLayout
       title="Forgot password"
       description="Enter your email to receive a password reset link."
-      onNavigate={onNavigate}
     >
-      {submitted && (
+      <Head title="Forgot password" />
+
+      {status && (
         <div
           role="status"
           className="mb-4 rounded-lg border border-emerald-200 bg-emerald-50 px-3 py-2 text-xs text-emerald-800 dark:border-emerald-900 dark:bg-emerald-950/60 dark:text-emerald-300"
         >
-          A reset link will be sent if the account exists in your Laravel application.
+          {status}
         </div>
       )}
 
-      <form onSubmit={handleSubmit} noValidate className="space-y-4">
+      <form onSubmit={handleSubmit} className="space-y-4">
         <div className="space-y-1.5">
           <Label htmlFor="forgot-email">Email address</Label>
           <Input
             id="forgot-email"
             type="email"
+            required
+            autoFocus
             autoComplete="email"
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
+            value={data.email}
+            onChange={(e) => setData('email', e.target.value)}
             placeholder="email@example.com"
-            aria-invalid={Boolean(error)}
+            aria-invalid={Boolean(errors.email)}
           />
-          {error && (
+          {errors.email && (
             <p className="text-xs text-red-600 dark:text-red-400" role="alert">
-              {error}
+              {errors.email}
             </p>
           )}
         </div>
 
-        <Button type="submit" className="w-full">
-          Email password reset link
+        <Button type="submit" className="w-full" disabled={processing}>
+          {processing ? 'Sending reset link...' : 'Email password reset link'}
         </Button>
 
         <p className="pt-2 text-center text-xs text-zinc-600 dark:text-zinc-400">
           Or, return to{' '}
-          <button
-            type="button"
-            onClick={() => onNavigate('login')}
-            className="font-medium text-zinc-900 hover:underline dark:text-zinc-100 cursor-pointer"
+          <Link
+            href={route('login')}
+            className="font-medium text-zinc-900 hover:underline dark:text-zinc-100"
           >
             log in
-          </button>
+          </Link>
         </p>
       </form>
     </AuthLayout>

@@ -1,31 +1,47 @@
 # Mehrad Laravel Devkit
 
-A standardized **Laravel + React + Inertia + TypeScript + Tailwind CSS + shadcn/ui** Starter Kit designed as an independent foundation for custom web applications, admin panels, CMSs, and CRMs.
+A standardized **Laravel 12 + React 19 + Inertia.js + TypeScript + Tailwind CSS v4 + shadcn/ui (Radix UI)** Starter Kit designed as an independent foundation for custom web applications, admin panels, CMSs, and CRMs.
 
-> **Current Implementation Status: Phase 1 (Working Starter)**
-> This repository currently implements Phase 1 of [`Design.md`](./Design.md). Core toolkit modules (Roles & Permissions, Activity Log, Module Catalog, CLI installers, and presets) are planned for Phase 2–4 and are intentionally not marked as available yet.
+> **Current Implementation Status: Phase 1 (Stabilized Starter Foundation)**
+> This repository implements Phase 1 of [`Design.md`](./Design.md). Core toolkit modules (Roles & Permissions, Activity Log, Module Catalog, CLI installers, and presets) belong to Phases 2–4 and are intentionally not installed in the base template.
 
 ---
 
-## Implemented in Phase 1
+## Implemented Features (Phase 1)
 
-- **Laravel 12** standard application structure (`app/`, `bootstrap/`, `config/`, `database/`, `routes/`, `tests/`)
-- **React 19 + TypeScript + Inertia.js v2** frontend architecture under `resources/js/` (`pages/`, `layouts/`, `components/ui/`, `lib/`, `types/`)
-- **Tailwind CSS v4** with semantic Light & Dark mode support (`@custom-variant dark`)
-- **Authentication & Account Settings** controllers, Form Requests, migrations, and Pest feature tests (`Login`, `Register`, `Password Reset`, `Profile`, `Password`, `Appearance`)
-- **Docker / Laravel Sail** environment (`compose.yaml` with PHP 8.4, MySQL 8.0, and Mailpit — no Redis or external search engine required)
-- **Code Quality & CI** via Laravel Pint (`pint.json`), Pest (`phpunit.xml`), Prettier (`.prettierrc`), TypeScript (`npm run lint`), and GitHub Actions (`.github/workflows/ci.yml`)
+- **Laravel 12** standard application layout (`app/`, `bootstrap/`, `config/`, `database/`, `routes/`, `tests/`)
+- **React 19 + TypeScript + Inertia.js** (`@inertiajs/react` + `inertiajs/inertia-laravel` + `laravel-vite-plugin` + `ziggy-js`) under `resources/js/` (`app.tsx`, `pages/`, `layouts/`, `components/ui/`, `hooks/`, `lib/`, `types/`)
+- **Tailwind CSS v4** with semantic Light, Dark, and System theme persistence (`@custom-variant dark` and `resources/js/hooks/use-appearance.ts`)
+- **UI Primitives** built with Radix UI (`@radix-ui/react-dialog`, `@radix-ui/react-label`, `@radix-ui/react-separator`, `@radix-ui/react-slot`)
+- **Authentication Flows**:
+  - Registration (`GET/POST /register`)
+  - Rate-limited Login with Remember Me (`GET/POST /login`)
+  - Logout with session invalidation (`POST /logout`)
+  - Forgot Password email link request (`GET/POST /forgot-password`)
+  - Password Reset form & submission (`GET /reset-password/{token}`, `POST /reset-password`)
+- **Protected Dashboard & User Settings** (`auth` middleware):
+  - Starter Kit Dashboard (`/dashboard`)
+  - Profile & email updates (`/settings/profile`)
+  - Password-confirmed account deletion (`DELETE /settings/profile`)
+  - Password update (`/settings/password`)
+  - Appearance theme selector (`/settings/appearance`)
+- **Docker / Laravel Sail** (`compose.yaml` with PHP 8.4, MySQL 8.0, and Mailpit — no Redis required)
+- **Code Quality & CI**: Laravel Pint (`pint.json`), Pest (`phpunit.xml`), ESLint (`eslint.config.js`), Prettier (`.prettierrc`), TypeScript (`npm run typecheck`), and GitHub Actions (`.github/workflows/ci.yml`)
+
+## Optional & Planned Integrations
+
+- **Optional Integrations (Not Required by Default)**: Redis (caching/queues), Meilisearch/Typesense, Sanctum, Socialite, Horizon, Telescope.
+- **Planned Future Modules (Phases 2–4)**: Roles & Permissions (`spatie/laravel-permission`), Activity Log (`spatie/laravel-activitylog`), Media Library, Backups, Module Catalog & CLI (`mehrad:module:*`), `minimal` and `cms-crm` presets.
+- **Note on Email Verification**: The `users` migration includes `email_verified_at`, and `ProfileController::update` resets `email_verified_at` when an email changes, while `MustVerifyEmail` and email verification routes are not enabled in Phase 1.
 
 ---
 
 ## Prerequisites
 
-For local PHP/Laravel development (outside Google AI Studio's Node/Vite preview container):
-
 - **PHP** `^8.3` (or **Docker** + **Docker Compose** for Laravel Sail)
 - **Composer** `^2.7`
 - **Node.js** `^22` & **npm** `^10`
-- **MySQL 8.0+** (or SQLite for quick local/test runs)
+- **MySQL 8.0+** (or SQLite for local testing; Pest tests run against SQLite `:memory:` per `phpunit.xml`)
 
 ---
 
@@ -44,6 +60,8 @@ php artisan migrate
 composer run dev
 ```
 
+*(Note: `.env.example` defaults to `DB_HOST=mysql` and `MAIL_HOST=mailpit` for Laravel Sail. When running locally without Docker, update `DB_HOST=127.0.0.1`, `DB_USERNAME`, `DB_PASSWORD`, or switch `DB_CONNECTION=sqlite` in `.env`.)*
+
 ### Option B: Docker / Laravel Sail
 
 ```bash
@@ -60,32 +78,27 @@ composer install --ignore-platform-reqs
 
 ---
 
-## Verification Commands
+## Verification & Development Commands
 
-Run backend and frontend checks in a PHP-capable environment:
+All JavaScript/TypeScript scripts below correspond to `package.json`; PHP/Composer scripts require PHP 8.3+ and Composer dependencies installed:
 
 ```bash
-# PHP formatting check
-./vendor/bin/pint --test
-
-# Backend Feature & Unit tests (Pest)
-php artisan test
-
-# Frontend TypeScript check & production build
+# Frontend checks (Node/npm)
+npm run typecheck
 npm run lint
+npm run format:check
+npm run test
 npm run build
+
+# Backend checks (PHP/Composer environment)
+./vendor/bin/pint --test
+php artisan test
 ```
-
----
-
-## Google AI Studio Preview Note
-
-Google AI Studio runs a Node.js + Vite preview runtime without PHP/Composer installed. The Vite entry point (`src/App.tsx`) renders the Starter Kit's `resources/js/` React + TypeScript pages and UI components directly so you can preview Welcome, Authentication, Dashboard, and Settings views in the browser. It does **not** replace the Laravel PHP backend with a Node.js backend; run PHP, Composer, Artisan, and Sail locally or in GitHub Actions CI.
 
 ---
 
 ## Contributing & License
 
-See [CONTRIBUTING.md](./CONTRIBUTING.md) for development workflow guidelines and [Design.md](./Design.md) for the full architecture roadmap.
+See [CONTRIBUTING.md](./CONTRIBUTING.md) for development workflow guidelines and [Design.md](./Design.md) for the multi-phase architecture roadmap.
 
 Licensed under the [MIT License](./LICENSE).

@@ -5,7 +5,6 @@ import {
   PHASE_1_STACK,
   filterStackDependencies,
   filterStarterFiles,
-  getRouteBreadcrumbs,
   resolveEffectiveTheme,
   validateLoginForm,
   validatePasswordForm,
@@ -95,12 +94,4 @@ test('resolveEffectiveTheme resolves explicit and system preferences', () => {
   assert.equal(resolveEffectiveTheme('dark', false), 'dark');
   assert.equal(resolveEffectiveTheme('system', true), 'dark');
   assert.equal(resolveEffectiveTheme('system', false), 'light');
-});
-
-test('getRouteBreadcrumbs returns expected breadcrumb trails', () => {
-  const crumbs = getRouteBreadcrumbs('settings.appearance');
-  assert.deepEqual(crumbs, [
-    { title: 'Settings', route: 'settings.profile' },
-    { title: 'Appearance', route: 'settings.appearance' },
-  ]);
 });

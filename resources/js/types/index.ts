@@ -7,20 +7,20 @@ export interface User {
   updated_at: string;
 }
 
-export interface BreadcrumbItem {
-  title: string;
-  route: AppRoute;
+export interface SharedData {
+  name: string;
+  auth: {
+    user: User | null;
+  };
+  ziggy: Record<string, unknown> & { location: string };
+  sidebarOpen: boolean;
+  [key: string]: unknown;
 }
 
-export type AppRoute =
-  | 'welcome'
-  | 'login'
-  | 'register'
-  | 'forgot-password'
-  | 'dashboard'
-  | 'settings.profile'
-  | 'settings.password'
-  | 'settings.appearance';
+export interface BreadcrumbItem {
+  title: string;
+  href: string;
+}
 
 export type ThemeMode = 'light' | 'dark' | 'system';
 

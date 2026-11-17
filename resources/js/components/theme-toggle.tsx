@@ -1,6 +1,6 @@
+import { cn } from '@/lib/utils';
+import type { ThemeMode } from '@/types';
 import { Monitor, Moon, Sun } from 'lucide-react';
-import { cn } from '../lib/utils';
-import type { ThemeMode } from '../types';
 
 interface ThemeToggleProps {
   appearance: ThemeMode;
@@ -31,7 +31,7 @@ export function ThemeToggle({ appearance, onChange, compact = false }: ThemeTogg
             aria-pressed={active}
             aria-label={`Set theme to ${label}`}
             className={cn(
-              'inline-flex items-center gap-1.5 rounded-md px-3 py-1.5 text-xs font-medium whitespace-nowrap shrink-0 cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-zinc-900 dark:focus-visible:ring-zinc-200',
+              'inline-flex shrink-0 cursor-pointer items-center gap-1.5 rounded-md px-3 py-1.5 text-xs font-medium whitespace-nowrap focus-visible:ring-2 focus-visible:ring-zinc-900 focus-visible:outline-none dark:focus-visible:ring-zinc-200',
               active
                 ? 'bg-white text-zinc-900 shadow-xs dark:bg-zinc-800 dark:text-zinc-100'
                 : 'text-zinc-600 hover:text-zinc-900 dark:text-zinc-300 dark:hover:text-zinc-100'

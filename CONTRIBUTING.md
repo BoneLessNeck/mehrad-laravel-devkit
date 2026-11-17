@@ -4,7 +4,7 @@ Thank you for contributing. Please follow the architectural rules defined in `De
 
 ## Guidelines
 
-1. Keep `main` green: all pull requests must pass GitHub Actions CI (Pint, Pest, TypeScript lint, and Vite build).
+1. Keep `main` green: all pull requests must pass GitHub Actions CI (Pint, Pest, TypeScript typecheck, ESLint, Prettier check, unit tests, and Vite build).
 2. Preserve Laravel's standard directory structure (`app/`, `routes/`, `database/`, `resources/js/`, `tests/`).
 3. Put validation in Form Requests (`app/Http/Requests/`) and keep controllers thin.
 4. Write TypeScript cleanly without unnecessary `any` types.
@@ -16,6 +16,9 @@ Thank you for contributing. Please follow the architectural rules defined in `De
 ```bash
 ./vendor/bin/pint --test
 php artisan test
+npm run typecheck
 npm run lint
+npm run format:check
+npm run test
 npm run build
 ```

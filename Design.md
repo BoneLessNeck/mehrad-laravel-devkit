@@ -3,7 +3,7 @@
 > Reference document for Google AI Studio and developers\
 > Proposed repository name: `mehrad-laravel-devkit`\
 > Repository type: GitHub Template Repository\
-> Status: MVP architecture\
+> Status: Phase 1 implemented; Phases 2–4 planned\
 > Documentation language: English; use English for filenames, classes,
 > and code.
 

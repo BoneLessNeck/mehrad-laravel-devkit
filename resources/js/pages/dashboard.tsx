@@ -1,22 +1,13 @@
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { Input } from '@/components/ui/input';
+import { AppLayout } from '@/layouts/app-layout';
+import { PHASE_1_FILES, PHASE_1_STACK, filterStarterFiles } from '@/lib/starter-kit';
+import { cn } from '@/lib/utils';
+import type { BreadcrumbItem, SharedData, StackLayer } from '@/types';
+import { Head, usePage } from '@inertiajs/react';
 import { Search } from 'lucide-react';
 import { useState } from 'react';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '../components/ui/card';
-import { Input } from '../components/ui/input';
-import { AppLayout } from '../layouts/app-layout';
-import {
-  PHASE_1_FILES,
-  PHASE_1_STACK,
-  filterStarterFiles,
-  getRouteBreadcrumbs,
-} from '../lib/starter-kit';
-import { cn } from '../lib/utils';
-import type { AppRoute, StackLayer, User } from '../types';
-
-interface DashboardPageProps {
-  user: User;
-  onNavigate: (route: AppRoute) => void;
-  onLogout: () => void;
-}
+import { route } from 'ziggy-js';
 
 const FILE_LAYERS: { value: StackLayer; label: string }[] = [
   { value: 'all', label: 'All' },
@@ -26,32 +17,31 @@ const FILE_LAYERS: { value: StackLayer; label: string }[] = [
   { value: 'infrastructure', label: 'Infra' },
 ];
 
-export function DashboardPage({ user, onNavigate, onLogout }: DashboardPageProps) {
+export default function Dashboard() {
+  const { auth } = usePage<SharedData>().props;
+  const user = auth.user;
+
   const [layer, setLayer] = useState<StackLayer>('all');
   const [query, setQuery] = useState('');
 
   const filteredFiles = filterStarterFiles(PHASE_1_FILES, layer, query);
+  const breadcrumbs: BreadcrumbItem[] = [{ title: 'Dashboard', href: route('dashboard') }];
 
   return (
-    <AppLayout
-      user={user}
-      activeRoute="dashboard"
-      breadcrumbs={getRouteBreadcrumbs('dashboard')}
-      onNavigate={onNavigate}
-      onLogout={onLogout}
-    >
+    <AppLayout breadcrumbs={breadcrumbs}>
+      <Head title="Dashboard" />
       <div className="space-y-8">
         <div>
           <h1 className="text-2xl font-semibold tracking-tight text-zinc-900 dark:text-zinc-100">
             Starter Kit Dashboard
           </h1>
           <p className="mt-1 text-sm text-zinc-600 dark:text-zinc-400">
-            Signed in as {user.name}. This workspace demonstrates the Phase 1 authenticated
-            Inertia shell.
+            Signed in as {user?.name ?? 'User'} ({user?.email ?? ''}). This workspace demonstrates
+            the Phase 1 authenticated Inertia shell.
           </p>
         </div>
 
-        {/* Summary Strip (3 clean metrics, tabular numerals, single-elevation hairline borders) */}
+        {/* Summary Strip */}
         <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
           <Card>
             <CardHeader className="pb-2">
@@ -69,7 +59,7 @@ export function DashboardPage({ user, onNavigate, onLogout }: DashboardPageProps
               <CardTitle className="text-2xl tabular-nums">{PHASE_1_STACK.length}</CardTitle>
             </CardHeader>
             <CardContent className="text-xs text-zinc-500 dark:text-zinc-400">
-              Composer, NPM, Pint, Pest, and Sail
+              Composer, NPM, Pint, Pest, ESLint, and Sail
             </CardContent>
           </Card>
 
@@ -99,7 +89,7 @@ export function DashboardPage({ user, onNavigate, onLogout }: DashboardPageProps
               <div className="flex flex-col gap-3 sm:flex-row sm:items-center">
                 <div className="relative">
                   <Search
-                    className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-zinc-400"
+                    className="pointer-events-none absolute top-1/2 left-3 h-4 w-4 -translate-y-1/2 text-zinc-400"
                     aria-hidden="true"
                   />
                   <Input
@@ -126,7 +116,7 @@ export function DashboardPage({ user, onNavigate, onLogout }: DashboardPageProps
                         onClick={() => setLayer(tab.value)}
                         aria-pressed={active}
                         className={cn(
-                          'rounded-md px-3 py-1.5 text-xs font-medium whitespace-nowrap shrink-0 cursor-pointer transition-colors',
+                          'shrink-0 cursor-pointer rounded-md px-3 py-1.5 text-xs font-medium whitespace-nowrap transition-colors',
                           active
                             ? 'bg-white text-zinc-900 shadow-xs dark:bg-zinc-800 dark:text-zinc-100'
                             : 'text-zinc-600 hover:text-zinc-900 dark:text-zinc-400 dark:hover:text-zinc-100'
@@ -163,14 +153,11 @@ export function DashboardPage({ user, onNavigate, onLogout }: DashboardPageProps
                     </tr>
                   ) : (
                     filteredFiles.map((file) => (
-                      <tr
-                        key={file.path}
-                        className="hover:bg-zinc-50/70 dark:hover:bg-zinc-800/40"
-                      >
+                      <tr key={file.path} className="hover:bg-zinc-50/70 dark:hover:bg-zinc-800/40">
                         <td className="px-4 py-3 font-mono text-xs whitespace-nowrap text-zinc-900 dark:text-zinc-100">
                           {file.path}
                         </td>
-                        <td className="px-4 py-3 capitalize whitespace-nowrap text-zinc-600 dark:text-zinc-400">
+                        <td className="px-4 py-3 whitespace-nowrap text-zinc-600 capitalize dark:text-zinc-400">
                           {file.layer}
                         </td>
                         <td className="px-4 py-3 text-zinc-600 dark:text-zinc-400">
