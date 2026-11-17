@@ -6,6 +6,13 @@ on:
   pull_request:
     branches: [main]
 
+permissions:
+  contents: read
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: ${{ github.ref != 'refs/heads/main' }}
+
 jobs:
   backend:
     name: Backend (PHP Lint, Pint & Pest)
@@ -23,7 +30,7 @@ jobs:
           coverage: none
 
       - name: Cache Composer dependencies
-        uses: actions/cache@v4
+        uses: actions/cache@v6
         with:
           path: vendor
           key: ${{ runner.os }}-composer-${{ hashFiles('**/composer.json', '**/composer.lock') }}
@@ -41,6 +48,15 @@ jobs:
 
       - name: Generate application key
         run: php artisan key:generate
+
+      - name: Verify database migrations
+        env:
+          DB_CONNECTION: sqlite
+          DB_DATABASE: database/database.sqlite
+        run: |
+          touch database/database.sqlite
+          php artisan migrate --force --no-interaction
+          rm -f database/database.sqlite
 
       - name: Run PHP syntax check
         run: find app bootstrap config database public routes tests -name '*.php' -print0 | xargs -0 -n1 php -l
