@@ -152,22 +152,22 @@ third-party package code.
 
 ## 4. Features and Package Catalog
 
-### 4.1 Version 1 Core
+### 4.1 Version 1 Core (Target Roadmap Across Phases 1–2)
 
-  Feature                          Solution
-  -------------------------------- ------------------------------------
-  Laravel + React foundation       Official Laravel React Starter Kit
-  Authentication                   Starter Kit capabilities / Fortify
-  Roles and permissions            `spatie/laravel-permission`
-  User activity logging            `spatie/laravel-activitylog`
-  PHP formatting                   Laravel Pint
-  Backend testing                  Pest or PHPUnit
-  Docker development environment   Laravel Sail
-  Frontend integration             Inertia + React + TypeScript
-  Styling                          Tailwind CSS
-  UI components                    shadcn/ui
-  Frontend quality checks          ESLint + Prettier
-  CI                               GitHub Actions
+  Feature                          Solution                              Phase
+  -------------------------------- ------------------------------------ --------
+  Laravel + React foundation       Official Laravel React Starter Kit    Phase 1
+  Authentication                   Starter Kit capabilities              Phase 1
+  Roles and permissions            `spatie/laravel-permission`           Phase 2 (planned)
+  User activity logging            `spatie/laravel-activitylog`          Phase 2 (planned)
+  PHP formatting                   Laravel Pint                          Phase 1
+  Backend testing                  Pest                                  Phase 1
+  Docker development environment   Laravel Sail                          Phase 1
+  Frontend integration             Inertia.js v3 + React + TypeScript    Phase 1
+  Styling                          Tailwind CSS v4                       Phase 1
+  UI components                    shadcn/ui (Radix UI)                  Phase 1
+  Frontend quality checks          ESLint + Prettier                     Phase 1
+  CI                               GitHub Actions                        Phase 1
 
 ### 4.2 Optional Modules
 

@@ -7,5 +7,5 @@ Describe the change and which Phase/section of `Design.md` it implements.
 - [ ] Preserves standard Laravel directory layout
 - [ ] Passes `./vendor/bin/pint --test`
 - [ ] Passes `php artisan test`
-- [ ] Passes `npm run lint` and `npm run build`
+- [ ] Passes `npm run typecheck`, `npm run lint`, `npm run format:check`, `npm run test`, and `npm run build`
 - [ ] No secrets or `.env` files committed
